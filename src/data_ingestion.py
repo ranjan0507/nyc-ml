@@ -1,9 +1,12 @@
 import pandas as pd
+import os
+import sys
+from typing import List
 
 RAW_PATH = 'data/raw/raw.csv'
 OUTPUT_PATH = 'data/processed/clean.csv'
 
-REQUIRED_FEATURES = [
+REQUIRED_FEATURES : List[str] = [
 	"fare_amount",
 	"trip_distance",
     "PULocationID" ,
@@ -14,27 +17,56 @@ REQUIRED_FEATURES = [
 	"RatecodeID"
 ]
 
-def load_data(path):
-	return pd.read_csv(path)
+def validate_path(path:str)->None:
+	if not os.path.exists(path):
+		raise FileNotFoundError(f"Raw data file not found at {path}")
+
+def load_data(path:str) -> pd.DataFrame:
+	try:
+		validate_path(path)
+		df = pd.read_csv(path)
+		print(f"File loaded succesfully with {df.shape} columns")
+		return df
+	except pd.errors.EmptyDataError:
+		raise RuntimeError('Raw File is Empty')
+	except Exception as e:
+		raise RuntimeError(f"Failed to load file at {path} , {e}")
+	
+def validate_schema(df:pd.DataFrame) -> None:
+	missing = [col for col in REQUIRED_FEATURES if col not in df.columns]
+	if missing:
+		raise RuntimeError(f"Required Columns {missing} are missing")
 
 def clean_data(df):
-	df = df[REQUIRED_FEATURES]
-	df = df.dropna(subset=['fare_amount'])
-	df = df[df['fare_amount']>0]
-	df = df[df['passenger_count']>=1]
-	df = df[df['passenger_count']<=6]
-	return df
+	try:
+		validate_schema(df)
 
-def save_processed(df):
-	df.to_csv(OUTPUT_PATH)
+		df = df[REQUIRED_FEATURES].copy()
+		df = df.dropna(subset='fare_amount')
+		df = df[df['fare_amount']>0]
+		df = df[df['passenger_count']>=1]
+		df = df[df['passenger_count']<=6]
+		print(f"Data loaded with {df.shape} columns")
+		return df
+	except Exception as e:
+		raise RuntimeError(f"Data cleaning failed {e}")
+
+def save_processed(df:pd.DataFrame,path:str)->None:
+	try:
+		os.makedirs(os.path.dirname(path),exist_ok=True)
+		df.to_csv(path,index=False)
+		print(f"Data saved at path {path}")
+	except Exception as e:
+		raise RuntimeError(f"Failed to save processed data {e}")
 
 def main():
-	df = load_data(RAW_PATH)
-	print('Data Loaded with shape : ', df.shape)
-	df = clean_data(df)
-	print('Clean Data Shape : ',df.shape)
-	save_processed(df)
-	print('Data saved to : ', OUTPUT_PATH)
+	try:
+		df = load_data(RAW_PATH)
+		clean_data(df)
+		save_processed(df,OUTPUT_PATH)
+
+	except Exception as e:
+		raise RuntimeError(f"Process failed , {e}")
 
 if __name__=="__main__":
 	main()
