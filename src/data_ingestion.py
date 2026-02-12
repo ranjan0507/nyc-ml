@@ -42,11 +42,15 @@ def clean_data(df):
 		validate_schema(df)
 
 		df = df[REQUIRED_FEATURES].copy()
+		df['fare_amount'] = pd.to_numeric(df['fare_amount'],errors='coerce')
 		df = df.dropna(subset='fare_amount')
 		df = df[df['fare_amount']>0]
+		df = df[df['fare_amount']<500]
 		df = df[df['passenger_count']>=1]
 		df = df[df['passenger_count']<=6]
 		print(f"Data loaded with {df.shape} columns")
+		print(df['fare_amount'].describe())
+		print(df['fare_amount'].isna().sum())
 		return df
 	except Exception as e:
 		raise RuntimeError(f"Data cleaning failed {e}")
@@ -62,7 +66,7 @@ def save_processed(df:pd.DataFrame,path:str)->None:
 def main():
 	try:
 		df = load_data(RAW_PATH)
-		clean_data(df)
+		df = clean_data(df)
 		save_processed(df,OUTPUT_PATH)
 
 	except Exception as e:
