@@ -18,7 +18,8 @@ This project implements an end-to-end machine learning system for predicting New
 
 ## Dataset Information
 
-**Source**: New York City Taxi and Limousine Commission (TLC) Trip Record Data (Yellow Taxi).
+**Source**: New York City Taxi and Limousine Commission (TLC) Trip Record Data (Yellow Taxi). 
+**Link**: https://www.kaggle.com/datasets/microize/newyork-yellow-taxi-trip-data-2020-2019?utm_source=chatgpt.com&select=yellow_tripdata_2020-04.csv
 **File Structure**: The system expects a raw CSV file at `data/raw/raw.csv`.
 
 ### Features Used
@@ -83,14 +84,14 @@ regressionProject/
 
 ## Technical Stack
 
-*   **Language**: Python 3.9+
+*   **Language**: Python 3.11+
 *   **Libraries**:
     *   **Data Manipulation**: Pandas, NumPy
     *   **Machine Learning**: Scikit-learn
     *   **API Framework**: FastAPI, Uvicorn
     *   **Serialization**: Joblib
 *   **Frontend**: Vanilla HTML5, CSS3, JavaScript (ES6+)
-*   **Environment Management**: Conda / Pip
+*   **Environment Management**: Conda
 
 ---
 
